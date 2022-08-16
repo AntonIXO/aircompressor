@@ -237,9 +237,12 @@ class CompressionParameters
         return strategy;
     }
 
-    public static CompressionParameters compute(int compressionLevel, int inputSize)
+    public static CompressionParameters compute(int compressionLevel, int estimatedInputSize)
     {
-        CompressionParameters defaultParameters = getDefaultParameters(compressionLevel, inputSize);
+        CompressionParameters defaultParameters = getDefaultParameters(compressionLevel, estimatedInputSize);
+        if (estimatedInputSize < 0) {
+            return defaultParameters;
+        }
 
         int targetLength = defaultParameters.targetLength;
         int windowLog = defaultParameters.windowLog;
@@ -255,9 +258,9 @@ class CompressionParameters
 
         // resize windowLog if input is small enough, to use less memory
         long maxWindowResize = 1L << (MAX_WINDOW_LOG - 1);
-        if (inputSize < maxWindowResize) {
+        if (estimatedInputSize < maxWindowResize) {
             int hashSizeMin = 1 << MIN_HASH_LOG;
-            int inputSizeLog = (inputSize < hashSizeMin) ? MIN_HASH_LOG : highestBit(inputSize - 1) + 1;
+            int inputSizeLog = (estimatedInputSize < hashSizeMin) ? MIN_HASH_LOG : highestBit(estimatedInputSize - 1) + 1;
             if (windowLog > inputSizeLog) {
                 windowLog = inputSizeLog;
             }
@@ -283,7 +286,7 @@ class CompressionParameters
     {
         int table = 0;
 
-        if (estimatedInputSize != 0) {
+        if (estimatedInputSize >= 0) {
             if (estimatedInputSize <= 16 * 1024) {
                 table = 3;
             }
