@@ -35,7 +35,7 @@ public class TestZstdStream
     @Override
     protected Compressor getCompressor()
     {
-        return new ZstdCompressor();
+        return new ZstdStreamCompressor();
     }
 
     @Override
@@ -118,7 +118,7 @@ public class TestZstdStream
     @Override
     public void testGetDecompressedSize(DataSet dataSet)
     {
-        super.testGetDecompressedSize(dataSet);
+        // streaming does not publish the size
     }
 
     @Override
