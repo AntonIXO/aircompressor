@@ -54,6 +54,7 @@ import static io.airlift.compress.zstd.UnsafeUtil.UNSAFE;
 import static io.airlift.compress.zstd.Util.checkArgument;
 import static io.airlift.compress.zstd.Util.checkState;
 import static io.airlift.compress.zstd.Util.fail;
+import static io.airlift.compress.zstd.Util.get24BitLittleEndian;
 import static io.airlift.compress.zstd.Util.mask;
 import static io.airlift.compress.zstd.Util.verify;
 import static java.lang.Math.max;
@@ -167,7 +168,7 @@ class ZstdFrameDecompressor
                 verify(input + SIZE_OF_BLOCK_HEADER <= inputLimit, input, "Not enough input bytes");
 
                 // read block header
-                int header = UNSAFE.getInt(inputBase, input) & 0xFF_FFFF;
+                int header = get24BitLittleEndian(inputBase, input);
                 input += SIZE_OF_BLOCK_HEADER;
 
                 lastBlock = (header & 1) != 0;
